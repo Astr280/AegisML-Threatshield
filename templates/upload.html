@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Dataset - Malware Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="AegisML ThreatShield">
+                <h2>AegisML ThreatShield</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('upload') }}" class="active">Upload</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="upload-section">
+        <div class="container">
+            <div class="upload-card">
+                <h2>Upload Dataset</h2>
+                <p class="upload-subtitle">Upload your malware dataset in CSV format</p>
+
+                {% if error %}
+                <div class="alert alert-error">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" class="upload-form">
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="file" name="file" accept=".csv" required class="file-input">
+                        <label for="file" class="file-label">
+                            <span class="file-icon">📁</span>
+                            <span class="file-text">Choose CSV File</span>
+                        </label>
+                        <div id="file-name" class="file-name"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">Upload Dataset</button>
+                </form>
+
+                <div class="upload-info">
+                    <h3>Dataset Requirements:</h3>
+                    <ul>
+                        <li>File format: CSV</li>
+                        <li>Expected records: ~4,465</li>
+                        <li>Features: 242 attributes</li>
+                        <li>Selected features: 23 key attributes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Malware Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        const fileName = document.getElementById('file-name');
+
+        fileInput.addEventListener('change', function (e) {
+            if (e.target.files.length > 0) {
+                fileName.textContent = 'Selected: ' + e.target.files[0].name;
+                fileName.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

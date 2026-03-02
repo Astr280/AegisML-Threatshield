@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict - AegisML ThreatShield</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/enhancements.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="AegisML ThreatShield">
+                <h2>AegisML ThreatShield</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('predict_page') }}" class="active">Predict</a></li>
+                <li><a href="{{ url_for('performance') }}">Performance</a></li>
+                <li><a href="{{ url_for('charts') }}">Charts</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="predict-section">
+        <div class="container">
+            <h2>Malware Prediction</h2>
+            <p class="section-subtitle">Select features and choose a model to predict malware</p>
+
+            <form method="POST" action="{{ url_for('predict') }}" class="predict-form" id="predict-form">
+                <div class="quick-actions">
+                    <button type="button" class="quick-btn" onclick="selectAllFeatures('yes')">
+                        ✅ Select All YES
+                    </button>
+                    <button type="button" class="quick-btn" onclick="selectAllFeatures('no')">
+                        ❌ Select All NO
+                    </button>
+                    <button type="button" class="quick-btn"
+                        onclick="document.getElementById('predict-form').reset(); showToast('Form reset!', 'info')">
+                        🔄 Reset Form
+                    </button>
+                </div>
+                <div class="features-grid-predict">
+                    {% for feature in features %}
+                    <div class="feature-item">
+                        <label class="feature-label">
+                            <span class="feature-name">{{ feature.replace('_', ' ').title() }}</span>
+                            <select name="{{ feature }}" class="feature-select">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="model-selection">
+                    <h3>Select Model</h3>
+                    <div class="model-options">
+                        <label class="radio-card">
+                            <input type="radio" name="model_type" value="extra_trees" checked>
+                            <div class="radio-content">
+                                <div class="radio-title">Extra Trees Classifier</div>
+                                <div class="radio-desc">Accuracy: 97.23%</div>
+                            </div>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="model_type" value="logistic">
+                            <div class="radio-content">
+                                <div class="radio-title">Logistic Regression</div>
+                                <div class="radio-desc">Accuracy: 93.67%</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-large">🔍 Predict</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Malware Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

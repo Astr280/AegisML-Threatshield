@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AegisML ThreatShield - Malware Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/enhancements.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="AegisML ThreatShield">
+                <h2>AegisML ThreatShield</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}" class="active">Home</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Hey there!</h1>
+                <h2 class="hero-subtitle">Welcome to AegisML ThreatShield</h2>
+                <p class="hero-description">
+                    Advanced Android malware detection system powered by Extra Trees Classifier
+                    and Logistic Regression models with high accuracy rates.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-card hover-lift card-glow">
+                        <div class="stat-value" data-target="97.23">0</div>
+                        <div class="stat-label">Extra Trees Accuracy</div>
+                    </div>
+                    <div class="stat-card hover-lift card-glow">
+                        <div class="stat-value" data-target="93.67">0</div>
+                        <div class="stat-label">Logistic Regression Accuracy</div>
+                    </div>
+                    <div class="stat-card hover-lift card-glow">
+                        <div class="stat-value" data-target="4465">0</div>
+                        <div class="stat-label">Dataset Records</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="showToast('Welcome to AegisML ThreatShield!', 'info')">
+                        ℹ️ Quick Info
+                    </button>
+                    <button class="quick-btn" onclick="copyToClipboard('http://127.0.0.1:5000')">
+                        📋 Copy URL
+                    </button>
+                    <button class="quick-btn" data-tooltip="Keyboard shortcuts available">
+                        ⌨️ Shortcuts: <span class="kbd">Ctrl+K</span>
+                    </button>
+                </div>
+
+                <a href="{{ url_for('login') }}" class="btn-primary btn-large">Get Started →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <div class="container">
+            <h2 class="section-title">Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>High Accuracy</h3>
+                    <p>Achieve up to 97.23% accuracy in malware detection using advanced ML algorithms</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-time Detection</h3>
+                    <p>Fast and efficient malware detection with instant results</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Performance Analytics</h3>
+                    <p>Comprehensive performance metrics and visualization</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Analysis</h3>
+                    <p>Safe and secure malware analysis environment</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Android Focus</h3>
+                    <p>Specialized in Android malware detection and analysis</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📄</div>
+                    <h3>PDF Reports</h3>
+                    <p>Export detailed prediction reports in PDF format</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Malware Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animate stat counters
+            setTimeout(() => {
+                document.querySelectorAll('.stat-value').forEach(stat => {
+                    const target = parseFloat(stat.getAttribute('data-target'));
+                    if (!isNaN(target)) {
+                        let current = 0;
+                        const increment = target / 100;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                stat.textContent = target + (target < 100 ? '%' : '');
+                                clearInterval(timer);
+                            } else {
+                                stat.textContent = Math.floor(current * 100) / 100 + (target < 100 ? '%' : '');
+                            }
+                        }, 20);
+                    }
+                });
+            }, 500);
+
+            // Show welcome toast on first visit
+            if (!localStorage.getItem('visited')) {
+                setTimeout(() => {
+                    showToast('Welcome to AegisML ThreatShield! 🛡️', 'success');
+                    localStorage.setItem('visited', 'true');
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Analysis - Malware Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="AegisML ThreatShield">
+                <h2>AegisML ThreatShield</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('predict_page') }}">Predict</a></li>
+                <li><a href="{{ url_for('performance') }}" class="active">Performance</a></li>
+                <li><a href="{{ url_for('charts') }}">Charts</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="performance-section">
+        <div class="container">
+            <h2>Performance Analysis</h2>
+
+            <!-- Logistic Regression -->
+            <div class="model-performance">
+                <h3 class="model-title">Logistic Regression</h3>
+
+                <div class="accuracy-scores">
+                    <div class="score-box">
+                        <div class="score-label">Train Accuracy</div>
+                        <div class="score-value">{{ lr_train_score }}%</div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-label">Test Accuracy</div>
+                        <div class="score-value">{{ lr_test_score }}%</div>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>Benign (Class 0)</h4>
+                        <div class="metric-row">
+                            <span>Precision:</span>
+                            <span>{{ "%.2f"|format(lr_report['0']['precision']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Recall:</span>
+                            <span>{{ "%.2f"|format(lr_report['0']['recall']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>F1-Score:</span>
+                            <span>{{ "%.2f"|format(lr_report['0']['f1-score']) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>Malware (Class 1)</h4>
+                        <div class="metric-row">
+                            <span>Precision:</span>
+                            <span>{{ "%.2f"|format(lr_report['1']['precision']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Recall:</span>
+                            <span>{{ "%.2f"|format(lr_report['1']['recall']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>F1-Score:</span>
+                            <span>{{ "%.2f"|format(lr_report['1']['f1-score']) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="confusion-matrix">
+                    <h4>Confusion Matrix</h4>
+                    <table class="cm-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Predicted Benign</th>
+                                <th>Predicted Malware</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>True Benign</strong></td>
+                                <td class="cm-cell cm-correct">{{ lr_cm[0][0] }}</td>
+                                <td class="cm-cell cm-incorrect">{{ lr_cm[0][1] }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>True Malware</strong></td>
+                                <td class="cm-cell cm-incorrect">{{ lr_cm[1][0] }}</td>
+                                <td class="cm-cell cm-correct">{{ lr_cm[1][1] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Extra Trees Classifier -->
+            <div class="model-performance">
+                <h3 class="model-title">Extra Trees Classifier</h3>
+
+                <div class="accuracy-scores">
+                    <div class="score-box">
+                        <div class="score-label">Train Accuracy</div>
+                        <div class="score-value">{{ et_train_score }}%</div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-label">Test Accuracy</div>
+                        <div class="score-value">{{ et_test_score }}%</div>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h4>Benign (Class 0)</h4>
+                        <div class="metric-row">
+                            <span>Precision:</span>
+                            <span>{{ "%.2f"|format(et_report['0']['precision']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Recall:</span>
+                            <span>{{ "%.2f"|format(et_report['0']['recall']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>F1-Score:</span>
+                            <span>{{ "%.2f"|format(et_report['0']['f1-score']) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>Malware (Class 1)</h4>
+                        <div class="metric-row">
+                            <span>Precision:</span>
+                            <span>{{ "%.2f"|format(et_report['1']['precision']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Recall:</span>
+                            <span>{{ "%.2f"|format(et_report['1']['recall']) }}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>F1-Score:</span>
+                            <span>{{ "%.2f"|format(et_report['1']['f1-score']) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="confusion-matrix">
+                    <h4>Confusion Matrix</h4>
+                    <table class="cm-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Predicted Benign</th>
+                                <th>Predicted Malware</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>True Benign</strong></td>
+                                <td class="cm-cell cm-correct">{{ et_cm[0][0] }}</td>
+                                <td class="cm-cell cm-incorrect">{{ et_cm[0][1] }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>True Malware</strong></td>
+                                <td class="cm-cell cm-incorrect">{{ et_cm[1][0] }}</td>
+                                <td class="cm-cell cm-correct">{{ et_cm[1][1] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Malware Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

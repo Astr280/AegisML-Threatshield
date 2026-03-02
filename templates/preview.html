@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Preview - Malware Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="AegisML ThreatShield">
+                <h2>AegisML ThreatShield</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('upload') }}">Upload</a></li>
+                <li><a href="{{ url_for('preview') }}" class="active">Preview</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="preview-section">
+        <div class="container">
+            <h2>Dataset Preview</h2>
+
+            <div class="dataset-stats">
+                <div class="stat-box">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ total_records }}</div>
+                        <div class="stat-text">Total Records</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon">🔢</div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ total_features }}</div>
+                        <div class="stat-text">Total Features</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-number">23</div>
+                        <div class="stat-text">Selected Features</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-table-wrapper">
+                <h3>First 10 Records</h3>
+                {{ preview_data|safe }}
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('train') }}" class="btn-primary btn-large"
+                    onclick="return confirm('This will train the models. It may take a few minutes. Continue?');">
+                    🚀 Click to Train & Test
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Malware Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Add loading animation when training starts
+        document.querySelector('.btn-primary').addEventListener('click', function (e) {
+            if (confirm('This will train the models. It may take a few minutes. Continue?')) {
+                this.innerHTML = '⏳ Training in progress...';
+                this.style.pointerEvents = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - Malware Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="AegisML ThreatShield">
+                <h2>AegisML ThreatShield</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('predict_page') }}">Predict</a></li>
+                <li><a href="{{ url_for('performance') }}">Performance</a></li>
+                <li><a href="{{ url_for('charts') }}">Charts</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="result-section">
+        <div class="container">
+            <h2>Prediction Result</h2>
+
+            <div class="result-card {% if result == 'Malware' %}result-malware{% else %}result-benign{% endif %}">
+                <div class="result-icon">
+                    {% if result == 'Malware' %}
+                    ⚠️
+                    {% else %}
+                    ✅
+                    {% endif %}
+                </div>
+                <div class="result-text">{{ result }}</div>
+                <div class="result-description">
+                    {% if result == 'Malware' %}
+                    This application is classified as <strong>MALWARE</strong>. It poses a security threat.
+                    {% else %}
+                    This application is classified as <strong>BENIGN</strong>. It appears to be safe.
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="result-details">
+                <h3>Model Used</h3>
+                <p class="model-name">{{ model }}</p>
+
+                <h3>Input Features (Selected as "Yes")</h3>
+                <div class="features-list">
+                    {% for feature, value in input_data.items() %}
+                    {% if value == 'yes' %}
+                    <span class="feature-badge">{{ feature.replace('_', ' ').title() }}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('download_pdf') }}" class="btn-primary">📄 Download PDF Report</a>
+                <a href="{{ url_for('predict_page') }}" class="btn-secondary">🔄 New Prediction</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Malware Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
