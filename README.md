@@ -1,3 +1,8 @@
+# AegisML Threatshield - Malware Analysis and Detection
+<p align="center">
+  <img src="AegisML Threatsheild.png" alt="AegisML Threatshield Banner" width="800">
+</p>
+
 # Malware Analysis and Detection Using Machine Learning
 
 A comprehensive Android malware detection system powered by Machine Learning algorithms including Extra Trees Classifier and Logistic Regression.
