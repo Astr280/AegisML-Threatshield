@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charts - Malware Detection</title>
+    <title>Charts - AegisML ThreatShield</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -30,7 +30,9 @@
     <div class="charts-section">
         <div class="container">
             <h2>Performance Charts</h2>
+            <p class="section-subtitle">Trained on DREBIN-215 Android Malware Dataset (15,036 real samples)</p>
 
+            {% if chart_data %}
             <div class="chart-container">
                 <h3>Model Accuracy Comparison</h3>
                 <canvas id="accuracyChart"></canvas>
@@ -40,36 +42,72 @@
                 <h3>Dataset Distribution</h3>
                 <canvas id="datasetChart"></canvas>
             </div>
+
+            {% if chart_data.top_features %}
+            <div class="chart-container">
+                <h3>Top 15 Feature Importances (Extra Trees)</h3>
+                <canvas id="featureChart"></canvas>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="model-performance" style="text-align:center; padding: 40px;">
+                <h3>No training data available</h3>
+                <p>Please upload a dataset and train models first to see charts.</p>
+                <a href="{{ url_for('upload') }}" class="btn-primary">Upload Dataset</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; Malware Detection System. All rights reserved.</p>
+            <p>&copy; AegisML ThreatShield — Trained on DREBIN-215 Dataset. All rights reserved.</p>
         </div>
     </footer>
 
+    {% if chart_data %}
     <script>
-        // Accuracy Chart
+        // ── Accuracy Chart ──────────────────────────────────────────
         const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
-        const accuracyChart = new Chart(accuracyCtx, {
+        new Chart(accuracyCtx, {
             type: 'bar',
             data: {
-                labels: ['Logistic Regression', 'Extra Trees Classifier'],
-                datasets: [{
-                    label: 'Test Accuracy (%)',
-                    data: [93.67, 97.23],
-                    backgroundColor: [
-                        'rgba(99, 102, 241, 0.8)',
-                        'rgba(16, 185, 129, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(99, 102, 241, 1)',
-                        'rgba(16, 185, 129, 1)'
-                    ],
-                    borderWidth: 2,
-                    borderRadius: 8
-                }]
+                labels: ['Extra Trees', 'Random Forest', 'Logistic Regression'],
+                datasets: [
+                    {
+                        label: 'Train Accuracy (%)',
+                        data: [{{ chart_data.et_train }}, {{ chart_data.rf_train }}, {{ chart_data.lr_train }}],
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.4)',
+                            'rgba(245, 158, 11, 0.4)',
+                            'rgba(16, 185, 129, 0.4)'
+                        ],
+                        borderColor: [
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(16, 185, 129, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Test Accuracy (%)',
+                        data: [{{ chart_data.et_test }}, {{ chart_data.rf_test }}, {{ chart_data.lr_test }}],
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(16, 185, 129, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(16, 185, 129, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -77,57 +115,39 @@
                 plugins: {
                     legend: {
                         display: true,
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Inter'
-                            }
-                        }
-                    },
-                    title: {
-                        display: false
+                        labels: { font: { size: 14, family: 'Inter' } }
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
+                        beginAtZero: false,
+                        min: 80,
                         max: 100,
                         ticks: {
-                            callback: function (value) {
-                                return value + '%';
-                            },
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
+                            callback: v => v + '%',
+                            font: { size: 12, family: 'Inter' }
                         },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
                     },
                     x: {
-                        ticks: {
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
+                        ticks: { font: { size: 12, family: 'Inter' } },
+                        grid: { display: false }
                     }
                 }
             }
         });
 
-        // Dataset Distribution Chart
+        // ── Dataset Distribution Chart ──────────────────────────────
         const datasetCtx = document.getElementById('datasetChart').getContext('2d');
-        const datasetChart = new Chart(datasetCtx, {
+        new Chart(datasetCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Malware (70%)', 'Benign/Goodware (30%)'],
+                labels: [
+                    'Malware ({{ chart_data.n_malware }})',
+                    'Benign ({{ chart_data.n_benign }})'
+                ],
                 datasets: [{
-                    data: [70, 30],
+                    data: [{{ chart_data.n_malware }}, {{ chart_data.n_benign }}],
                     backgroundColor: [
                         'rgba(239, 68, 68, 0.8)',
                         'rgba(34, 197, 94, 0.8)'
@@ -146,20 +166,57 @@
                     legend: {
                         position: 'bottom',
                         labels: {
-                            font: {
-                                size: 14,
-                                family: 'Inter'
-                            },
+                            font: { size: 14, family: 'Inter' },
                             padding: 20
                         }
-                    },
-                    title: {
-                        display: false
                     }
                 }
             }
         });
+
+        {% if chart_data.top_features %}
+        // ── Feature Importance Chart ────────────────────────────────
+        const featureCtx = document.getElementById('featureChart').getContext('2d');
+        new Chart(featureCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data.top_features | tojson }},
+                datasets: [{
+                    label: 'Importance (%)',
+                    data: {{ chart_data.top_importances | tojson }},
+                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                    borderColor: 'rgba(99, 102, 241, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: v => v + '%',
+                            font: { size: 11, family: 'Inter' }
+                        },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    y: {
+                        ticks: { font: { size: 11, family: 'Inter' } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+        // Set a proper height for the horizontal bar chart
+        document.getElementById('featureChart').parentElement.style.height = '500px';
+        {% endif %}
     </script>
+    {% endif %}
 </body>
 
 </html>

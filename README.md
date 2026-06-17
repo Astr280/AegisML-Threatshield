@@ -11,13 +11,14 @@ A comprehensive Android malware detection system powered by Machine Learning alg
 
 This project implements an intelligent malware detection system that analyzes Android applications based on their permission patterns and classifies them as either **Malware** or **Benign**. The system achieves high accuracy rates:
 
-- **Extra Trees Classifier**: 97.23% test accuracy
-- **Logistic Regression**: 93.67% test accuracy
+- **Extra Trees Classifier**: ~98% test accuracy
+- **Random Forest**: ~98% test accuracy
+- **Logistic Regression**: ~95% test accuracy
 
 ## ✨ Features
 
-- **Dual Model Architecture**: Choose between Extra Trees Classifier and Logistic Regression
-- **Real-time Detection**: Instant malware classification based on app permissions
+- **Tri-Model Architecture**: Compare Extra Trees, Random Forest, and Logistic Regression
+- **Real-time Detection**: Instant malware classification based on actual Android permissions (DREBIN dataset)
 - **Performance Analytics**: Comprehensive metrics including precision, recall, F1-score, and confusion matrices
 - **Interactive Charts**: Visual representation of model performance and dataset distribution
 - **PDF Reports**: Export prediction results as downloadable PDF reports
@@ -40,39 +41,17 @@ This project implements an intelligent malware detection system that analyzes An
 - **JavaScript** - Interactivity
 - **Chart.js** - Data visualization
 
-## 📊 Dataset Information
+## 📊 Dataset Information (DREBIN-215)
 
-- **Total Records**: 4,465 samples
-- **Total Attributes**: 242 features
-- **Selected Features**: 23 key permission-based attributes
-- **Distribution**: 70% Malware, 30% Benign
+- **Total Records**: 15,036 samples
+- **Features**: 215 attributes (Android Permissions, API Calls, Intents)
+- **Distribution**: 5,560 Malware (Suspect), 9,476 Benign
 - **Format**: CSV
+- **Source**: Figshare (Yerima, S.Y., 2018. DroidFusion)
 
-### Selected Features (23 Attributes)
+### Dynamic Feature Detection
 
-1. access_all_downloads
-2. access_cache_filesystem
-3. access_fine_location
-4. access_network_state
-5. access_service
-6. access_shared_data
-7. access_superuser
-8. access_wifi_state
-9. camera
-10. change_configuration
-11. delete_cache_files
-12. read_attachment
-13. read_contacts
-14. read_data
-15. read_external_storage
-16. read_gmail
-17. read_history_bookmarks
-18. read_messages
-19. read_phone_state
-20. read_settings
-21. read_sms
-22. receive_boot_completed
-23. receive_sms
+The system dynamically detects and uses all 215 features present in the dataset. The web interface automatically extracts the **Top 25 most critical features** based on the Extra Trees algorithm's feature importance calculation.
 
 ## 🚀 Installation & Setup
 
@@ -87,13 +66,13 @@ This project implements an intelligent malware detection system that analyzes An
 pip install -r requirements.txt
 ```
 
-### Step 2: Generate Dataset
+### Step 2: Download the DREBIN-215 Dataset
 
 ```powershell
 python generate_dataset.py
 ```
 
-This will create an `upload.csv` file with 4,465 synthetic malware samples.
+This will safely download the official `drebin215.csv` (15,036 samples) from Figshare into the `data/` directory.
 
 ### Step 3: Run the Application
 
@@ -111,10 +90,9 @@ The application will start on `http://127.0.0.1:5000/`
   - **Username**: `admin`
   - **Password**: `admin`
 
-### 2. Upload Dataset
+### 2. Load Dataset
 - Click on "Upload" in the navigation menu
-- Select the `upload.csv` file
-- Click "Upload Dataset"
+- Click the convenient **"Load DREBIN-215 Dataset"** button, OR manually upload your own CSV dataset.
 
 ### 3. Preview & Train
 - Review the dataset statistics and preview
@@ -123,13 +101,13 @@ The application will start on `http://127.0.0.1:5000/`
 
 ### 4. Make Predictions
 - Select features (permissions) as "Yes" or "No"
-- Choose a model (Extra Trees or Logistic Regression)
+- Choose a model (Extra Trees, Random Forest, or Logistic Regression)
 - Click "Predict" to get the classification result
 
 ### 5. View Performance
 - Navigate to "Performance" to see detailed metrics
 - View confusion matrices, precision, recall, and F1-scores
-- Compare both models side-by-side
+- Compare all three models side-by-side
 
 ### 6. Analyze Charts
 - Navigate to "Charts" for visual analytics
@@ -142,15 +120,13 @@ The application will start on `http://127.0.0.1:5000/`
 
 ## 📈 Model Performance
 
-### Extra Trees Classifier
-- **Train Accuracy**: 97.42%
-- **Test Accuracy**: 97.23%
-- **Advantages**: Higher accuracy, better feature importance analysis
+### Extra Trees Classifier & Random Forest
+- **Test Accuracy**: ~98%
+- **Advantages**: Higher accuracy, automatically calculates dynamic feature importance to highlight the most dangerous Android permissions.
 
 ### Logistic Regression
-- **Train Accuracy**: 94.84%
-- **Test Accuracy**: 93.67%
-- **Advantages**: Faster training, interpretable coefficients
+- **Test Accuracy**: ~95%
+- **Advantages**: Faster training, interpretable coefficients. (Note: Uses StandardScaler for optimal convergence).
 
 ## 🎨 Design Features
 
@@ -173,9 +149,10 @@ The application will start on `http://127.0.0.1:5000/`
 Cybersecurity Project/
 │
 ├── app.py                      # Main Flask application
-├── generate_dataset.py         # Dataset generation script
+├── generate_dataset.py         # DREBIN-215 downloader script
 ├── requirements.txt            # Python dependencies
-├── upload.csv                  # Generated dataset (after running script)
+├── data/                       # Dataset directory
+│   └── drebin215.csv           # DREBIN-215 dataset (after running script)
 │
 ├── templates/                  # HTML templates
 │   ├── index.html             # Home page
@@ -220,10 +197,9 @@ Cybersecurity Project/
 
 ## 📚 References
 
-Based on the research paper:
-**"Intelligent Pattern Recognition using Equilibrium Optimizer with Deep Learning Model for Android Malware Detection"**
-- Journal: IEEE 2024
-- Focus: Android malware detection using deep learning
+- **Dataset**: DREBIN-215 (15,036 samples, 215 features)
+- **Source Paper**: Yerima, S.Y. and Sezer, S., 2018. *DroidFusion: A Novel Multilevel Classifier Fusion Approach for Android Malware Detection*. IEEE Transactions on Cybernetics.
+- **Original DREBIN Paper**: Arp, D. et al., 2014. *DREBIN: Effective and Explainable Detection of Android Malware in Your Pocket*. NDSS 2014.
 
 ## 👨‍💻 Development Notes
 

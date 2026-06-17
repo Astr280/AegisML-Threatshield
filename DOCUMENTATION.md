@@ -32,9 +32,10 @@ The system follows a three-tier architecture:
 
 3. **Data Layer** (ML Models)
    - Extra Trees Classifier
+   - Random Forest Classifier
    - Logistic Regression
    - scikit-learn pipeline
-   - In-memory data storage
+   - StandardScaler for linear convergence
 
 ### Data Flow
 
@@ -63,9 +64,9 @@ app.py
 │   ├── /charts
 │   └── /download_pdf
 └── Global Variables
-    ├── Models (Extra Trees, Logistic)
+    ├── Models (Extra Trees, Random Forest, Logistic)
     ├── Data (X_train, X_test, y_train, y_test)
-    └── Features
+    └── Dynamic Feature Extraction
 ```
 
 #### Session Management
@@ -126,11 +127,26 @@ ExtraTreesClassifier(
   - Robust to overfitting
 
 #### Performance
-- Train Accuracy: 97.42%
-- Test Accuracy: 97.23%
-- Training Time: ~30-60 seconds (dataset dependent)
+- Test Accuracy: ~98.4%
+- Training Time: ~5-15 seconds (on 15,036 samples)
 
-### 2. Logistic Regression
+### 2. Random Forest Classifier
+
+#### Configuration
+```python
+RandomForestClassifier(
+    n_estimators=200,
+    random_state=42,
+    n_jobs=-1
+)
+```
+
+#### Characteristics
+- **Type**: Ensemble method
+- **Advantages**: Robust bagging algorithm, highly parallelizable, resistant to variance.
+- **Performance**: Test Accuracy: ~98.6%
+
+### 3. Logistic Regression
 
 #### Configuration
 ```python
@@ -142,84 +158,60 @@ LogisticRegression(
 
 #### Characteristics
 - **Type**: Linear classifier
-- **Optimization**: L-BFGS solver
+- **Optimization**: L-BFGS solver with StandardScaler
 - **Advantages**:
   - Fast training
   - Interpretable coefficients
   - Probabilistic outputs
-  - Low computational cost
 
 #### Performance
-- Train Accuracy: 94.84%
-- Test Accuracy: 93.67%
-- Training Time: ~10-20 seconds
+- Test Accuracy: ~95.7%
+- Training Time: ~5 seconds
 
 ---
 
 ## Dataset Details
 
-### Structure
+### Structure (DREBIN-215)
 
 #### Total Dataset
-- **Records**: 4,465 samples
-- **Original Features**: 242 attributes
-- **Selected Features**: 23 attributes
-- **Target Variable**: Binary (malware/benign)
+- **Records**: 15,036 samples
+- **Original Features**: 215 attributes (Android permissions, API calls, intents, and commands)
+- **Target Variable**: Binary (S = malware, B = benign)
 
 #### Class Distribution
-- **Malware**: 70% (3,125 samples)
-- **Benign**: 30% (1,340 samples)
+- **Malware**: 37% (5,560 samples from DREBIN project)
+- **Benign**: 63% (9,476 safe apps)
 
 ### Feature Selection Rationale
 
-The 23 selected features represent critical Android permissions:
+Instead of relying on a hardcoded subset of permissions, the system processes all **215 attributes** defined in the DREBIN specification. The most critical features are determined dynamically via the `ExtraTreesClassifier.feature_importances_` property. 
 
-1. **Network Access** (4 features)
-   - access_network_state
-   - access_wifi_state
-   - access_fine_location
-   - access_service
-
-2. **Data Access** (10 features)
-   - read_contacts
-   - read_sms
-   - read_phone_state
-   - read_external_storage
-   - read_gmail
-   - read_messages
-   - read_attachment
-   - read_data
-   - read_settings
-   - read_history_bookmarks
-
-3. **System Modifications** (5 features)
-   - change_configuration
-   - delete_cache_files
-   - access_superuser
-   - access_cache_filesystem
-   - access_shared_data
-
-4. **Boot & Messaging** (2 features)
-   - receive_boot_completed
-   - receive_sms
-
-5. **Hardware Access** (2 features)
-   - camera
-   - access_all_downloads
+Common high-impact features often include:
+- `SEND_SMS`
+- `READ_PHONE_STATE`
+- `android.telephony.SmsManager`
+- `INSTALL_PACKAGES`
+- `ACCESS_FINE_LOCATION`
 
 ### Data Preprocessing
 
 ```python
-# Feature extraction
-X = dataset[SELECTED_FEATURES]
+# Handle non-numeric and fill NA
+for col in X.columns:
+    X[col] = pd.to_numeric(X[col], errors='coerce')
+X = X.fillna(0)
 
-# Target encoding
-y = dataset['class'].map(lambda x: 1 if x == 'malware' else 0)
+# Encode DREBIN-215 target labels
+def encode_labels(series):
+    # Map 'S' (Suspect) -> 1, 'B' (Benign) -> 0
+    return series.map(...)
 
-# Train-test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
-)
+y = encode_labels(dataset[class_col])
+
+# Feature Scaling for Logistic Regression
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
 ```
 
 ---
@@ -268,7 +260,8 @@ X_train, X_test, y_train, y_test = train_test_split(
   1. Load dataset
   2. Preprocess data
   3. Train Extra Trees
-  4. Train Logistic Regression
+  4. Train Random Forest
+  5. Scale data & Train Logistic Regression
 - **Response**: Redirect to /predict_page
 
 #### GET /predict_page
@@ -278,7 +271,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 #### POST /predict
 - **Description**: Make malware prediction
-- **Parameters**: 23 feature values + model_type
+- **Parameters**: Dynamic feature values + model_type
 - **Response**: HTML with prediction result
 
 #### GET /performance
@@ -364,14 +357,11 @@ Overall correctness
 
 ### Model Comparison
 
-| Metric | Extra Trees | Logistic Regression |
-|--------|-------------|---------------------|
-| Train Accuracy | 97.42% | 94.84% |
-| Test Accuracy | 97.23% | 93.67% |
-| Training Time | ~45s | ~15s |
-| Prediction Time | ~0.01s | ~0.001s |
-| Memory Usage | Higher | Lower |
-| Interpretability | Medium | High |
+| Metric | Extra Trees | Random Forest | Logistic Regression |
+|--------|-------------|---------------|---------------------|
+| Test Accuracy | ~98.4% | ~98.6% | ~95.7% |
+| Memory Usage | High | High | Low |
+| Interpretability | Medium | Medium | High |
 
 ---
 

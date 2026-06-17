@@ -1,88 +1,151 @@
-import pandas as pd
-import numpy as np
+"""
+Download the DREBIN-215 Android Malware Dataset.
 
-# Set random seed for reproducibility
-np.random.seed(42)
+Source: Figshare (S.Y. Yerima)
+DOI: 10.6084/m9.figshare.5854653.v1
 
-# Number of samples
-n_samples = 4465
+Dataset: 15,036 apps (5,560 malware + 9,476 benign) with 215 binary features
+extracted via static analysis of Android apps (permissions, API calls, intents, commands).
 
-# Selected features (23 attributes)
-features = [
-    'access_all_downloads', 'access_cache_filesystem', 'access_fine_location',
-    'access_network_state', 'access_service', 'access_shared_data',
-    'access_superuser', 'access_wifi_state', 'camera', 'change_configuration',
-    'delete_cache_files', 'read_attachment', 'read_contacts', 'read_data',
-    'read_external_storage', 'read_gmail', 'read_history_bookmarks',
-    'read_messages', 'read_phone_state', 'read_settings', 'read_sms',
-    'receive_boot_completed', 'receive_sms'
-]
+Citation:
+  Yerima, S.Y. and Sezer, S., 2018. DroidFusion: A Novel Multilevel Classifier
+  Fusion Approach for Android Malware Detection. IEEE Transactions on Cybernetics.
 
-# Create dataset
-data = {}
+  Arp, D. et al., 2014. DREBIN: Effective and Explainable Detection of Android
+  Malware in Your Pocket. NDSS 2014.
+"""
 
-# Generate binary features (0 or 1)
-for feature in features:
-    # Different probabilities for different features to make it realistic
-    if 'read' in feature or 'access' in feature:
-        # More common permissions
-        prob = np.random.uniform(0.3, 0.7)
-    elif 'receive' in feature:
-        # Less common
-        prob = np.random.uniform(0.2, 0.5)
+import os
+import sys
+import time
+import hashlib
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+CSV_PATH = os.path.join(DATA_DIR, "drebin215.csv")
+
+# Figshare file download URL for the DREBIN-215 CSV
+DOWNLOAD_URL = "https://ndownloader.figshare.com/files/10391991"
+
+# Expected dataset properties (for validation)
+EXPECTED_MIN_ROWS = 15000
+EXPECTED_COLS = 216  # 215 features + 1 class label
+
+
+def download_dataset():
+    """Download the DREBIN-215 dataset from Figshare."""
+    import urllib.request
+
+    os.makedirs(DATA_DIR, exist_ok=True)
+
+    if os.path.exists(CSV_PATH) and os.path.getsize(CSV_PATH) > 1000:
+        print(f"[✓] Dataset already exists at: {CSV_PATH}")
+        print(f"    Size: {os.path.getsize(CSV_PATH):,} bytes")
+        return True
+
+    print(f"[↓] Downloading DREBIN-215 dataset from Figshare...")
+    print(f"    URL: {DOWNLOAD_URL}")
+    print(f"    Destination: {CSV_PATH}")
+
+    max_retries = 5
+    for attempt in range(1, max_retries + 1):
+        try:
+            req = urllib.request.Request(
+                DOWNLOAD_URL,
+                headers={"User-Agent": "Mozilla/5.0 (AegisML-ThreatShield)"},
+            )
+            resp = urllib.request.urlopen(req, timeout=60)
+
+            if resp.status == 202:
+                print(f"    Attempt {attempt}/{max_retries}: Server is preparing file (HTTP 202), retrying in 5s...")
+                time.sleep(5)
+                continue
+
+            data = resp.read()
+            if len(data) < 1000:
+                print(f"    Attempt {attempt}/{max_retries}: Received only {len(data)} bytes, retrying in 5s...")
+                time.sleep(5)
+                continue
+
+            with open(CSV_PATH, "wb") as f:
+                f.write(data)
+
+            print(f"[✓] Downloaded {len(data):,} bytes")
+            return True
+
+        except Exception as e:
+            print(f"    Attempt {attempt}/{max_retries}: Error - {e}")
+            if attempt < max_retries:
+                time.sleep(5)
+
+    print(f"\n[!] Could not download automatically after {max_retries} attempts.")
+    print(f"    Please download manually from:")
+    print(f"    https://figshare.com/articles/dataset/Android_malware_dataset_for_machine_learning_2/5854653")
+    print(f"    Save the CSV file as: {CSV_PATH}")
+    return False
+
+
+def validate_dataset():
+    """Validate the downloaded dataset."""
+    try:
+        import pandas as pd
+    except ImportError:
+        print("[!] pandas not installed. Run: pip install pandas")
+        return False
+
+    if not os.path.exists(CSV_PATH):
+        print(f"[✗] Dataset file not found: {CSV_PATH}")
+        return False
+
+    print(f"\n[*] Validating dataset...")
+
+    df = pd.read_csv(CSV_PATH)
+    n_rows, n_cols = df.shape
+    class_col = df.columns[-1]
+    class_dist = df[class_col].value_counts()
+
+    print(f"    File: {CSV_PATH}")
+    print(f"    Size: {os.path.getsize(CSV_PATH):,} bytes")
+    print(f"    SHA-256: {hashlib.sha256(open(CSV_PATH, 'rb').read()).hexdigest()[:16]}...")
+    print(f"\n    Rows: {n_rows:,}")
+    print(f"    Columns: {n_cols}")
+    print(f"    Class column: '{class_col}'")
+    print(f"\n    Class distribution:")
+    for label, count in class_dist.items():
+        pct = count / n_rows * 100
+        print(f"      {label}: {count:,} ({pct:.1f}%)")
+
+    print(f"\n    Feature columns (first 10):")
+    for col in df.columns[:10]:
+        print(f"      - {col}")
+    print(f"      ... and {n_cols - 11} more features")
+
+    # Validation checks
+    issues = []
+    if n_rows < EXPECTED_MIN_ROWS:
+        issues.append(f"Expected >= {EXPECTED_MIN_ROWS} rows, got {n_rows}")
+    if n_cols != EXPECTED_COLS:
+        issues.append(f"Expected {EXPECTED_COLS} columns, got {n_cols}")
+
+    if issues:
+        print(f"\n[!] Validation warnings:")
+        for issue in issues:
+            print(f"    - {issue}")
+        print(f"    The dataset may still work, but column count differs from expected.")
     else:
-        # Moderate
-        prob = np.random.uniform(0.25, 0.6)
-    
-    data[feature] = np.random.binomial(1, prob, n_samples)
+        print(f"\n[✓] Dataset validation passed!")
 
-# Create DataFrame
-df = pd.DataFrame(data)
+    return True
 
-# Generate target variable (class)
-# 70% malware, 30% benign
-n_malware = int(n_samples * 0.7)
-n_benign = n_samples - n_malware
 
-# Create class labels
-class_labels = ['malware'] * n_malware + ['benign'] * n_benign
-np.random.shuffle(class_labels)
-df['class'] = class_labels
+if __name__ == "__main__":
+    print("=" * 60)
+    print("  DREBIN-215 Android Malware Dataset Downloader")
+    print("  AegisML ThreatShield")
+    print("=" * 60)
+    print()
 
-# Add some correlation patterns for malware
-# Malware often has multiple suspicious permissions
-malware_indices = df[df['class'] == 'malware'].index
-
-# Increase certain permission combinations for malware
-for idx in malware_indices:
-    if np.random.random() > 0.5:
-        # Malware often reads SMS and contacts
-        df.loc[idx, 'read_sms'] = 1
-        df.loc[idx, 'read_contacts'] = 1
-    
-    if np.random.random() > 0.6:
-        # Malware often accesses network and location
-        df.loc[idx, 'access_network_state'] = 1
-        df.loc[idx, 'access_fine_location'] = 1
-    
-    if np.random.random() > 0.7:
-        # Some malware tries to access superuser
-        df.loc[idx, 'access_superuser'] = 1
-    
-    if np.random.random() > 0.5:
-        # Malware often receives boot completed to start automatically
-        df.loc[idx, 'receive_boot_completed'] = 1
-
-# Save to CSV
-df.to_csv('upload.csv', index=False)
-
-print(f"Dataset created successfully!")
-print(f"Total samples: {n_samples}")
-print(f"Features: {len(features)}")
-print(f"Malware samples: {(df['class'] == 'malware').sum()}")
-print(f"Benign samples: {(df['class'] == 'benign').sum()}")
-print(f"\nDataset saved as 'upload.csv'")
-print(f"\nFirst few rows:")
-print(df.head())
-print(f"\nClass distribution:")
-print(df['class'].value_counts())
+    success = download_dataset()
+    if success:
+        validate_dataset()
+    else:
+        sys.exit(1)

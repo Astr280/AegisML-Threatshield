@@ -586,6 +586,7 @@ body {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    gap: 0.8rem;
 }
 
 .feature-name {
@@ -593,6 +594,8 @@ body {
     font-weight: 500;
     flex: 1;
     font-size: 0.9rem;
+    word-break: break-all; /* Fixes long text overflow */
+    line-height: 1.3;
 }
 
 .feature-select {
@@ -1008,4 +1011,14 @@ body {
     .stat-card {
         padding: 1.5rem;
     }
+}
+.feature-importance-badge {
+    background-color: rgba(99, 102, 241, 0.15);
+    color: #6366f1;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+    border: 1px solid rgba(99, 102, 241, 0.3);
 }

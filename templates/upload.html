@@ -49,13 +49,23 @@
                     <button type="submit" class="btn-primary btn-block">Upload Dataset</button>
                 </form>
 
+                {% if drebin_exists %}
+                <div style="text-align: center; margin: 20px 0;">
+                    <p style="margin-bottom: 10px; color: #94a3b8;">— or —</p>
+                    <a href="{{ url_for('load_drebin') }}" class="btn-primary btn-block" style="display:inline-block; background: linear-gradient(135deg, #10b981, #059669);">
+                        🧬 Load DREBIN-215 Dataset (15,036 real samples)
+                    </a>
+                </div>
+                {% endif %}
+
                 <div class="upload-info">
-                    <h3>Dataset Requirements:</h3>
+                    <h3>Recommended Dataset: DREBIN-215</h3>
                     <ul>
                         <li>File format: CSV</li>
-                        <li>Expected records: ~4,465</li>
-                        <li>Features: 242 attributes</li>
-                        <li>Selected features: 23 key attributes</li>
+                        <li>Samples: 15,036 (5,560 malware + 9,476 benign)</li>
+                        <li>Features: 215 binary attributes (permissions, API calls, intents)</li>
+                        <li>Source: Figshare (Yerima & Sezer, 2018)</li>
+                        <li>Run <code>python generate_dataset.py</code> to download</li>
                     </ul>
                 </div>
             </div>

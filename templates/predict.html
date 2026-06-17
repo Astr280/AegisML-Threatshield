@@ -31,7 +31,7 @@
     <div class="predict-section">
         <div class="container">
             <h2>Malware Prediction</h2>
-            <p class="section-subtitle">Select features and choose a model to predict malware</p>
+            <p class="section-subtitle">Select permissions/features detected in the Android app (top {{ features|length }} most important features shown)</p>
 
             <form method="POST" action="{{ url_for('predict') }}" class="predict-form" id="predict-form">
                 <div class="quick-actions">
@@ -51,6 +51,11 @@
                     <div class="feature-item">
                         <label class="feature-label">
                             <span class="feature-name">{{ feature.replace('_', ' ').title() }}</span>
+                            {% if feature_importances and feature in feature_importances %}
+                            <span class="feature-importance-badge" title="Importance: {{ '%.2f'|format(feature_importances[feature] * 100) }}%">
+                                {{ '%.1f'|format(feature_importances[feature] * 100) }}%
+                            </span>
+                            {% endif %}
                             <select name="{{ feature }}" class="feature-select">
                                 <option value="no">No</option>
                                 <option value="yes">Yes</option>
@@ -60,6 +65,13 @@
                     {% endfor %}
                 </div>
 
+                <!-- Hidden fields for all other features (default to 'no') -->
+                {% for feature in all_features %}
+                {% if feature not in features %}
+                <input type="hidden" name="{{ feature }}" value="no">
+                {% endif %}
+                {% endfor %}
+
                 <div class="model-selection">
                     <h3>Select Model</h3>
                     <div class="model-options">
@@ -67,14 +79,21 @@
                             <input type="radio" name="model_type" value="extra_trees" checked>
                             <div class="radio-content">
                                 <div class="radio-title">Extra Trees Classifier</div>
-                                <div class="radio-desc">Accuracy: 97.23%</div>
+                                <div class="radio-desc">Test Accuracy: {{ model_scores.et_test }}%</div>
+                            </div>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="model_type" value="random_forest">
+                            <div class="radio-content">
+                                <div class="radio-title">Random Forest</div>
+                                <div class="radio-desc">Test Accuracy: {{ model_scores.rf_test }}%</div>
                             </div>
                         </label>
                         <label class="radio-card">
                             <input type="radio" name="model_type" value="logistic">
                             <div class="radio-content">
                                 <div class="radio-title">Logistic Regression</div>
-                                <div class="radio-desc">Accuracy: 93.67%</div>
+                                <div class="radio-desc">Test Accuracy: {{ model_scores.lr_test }}%</div>
                             </div>
                         </label>
                     </div>
@@ -87,7 +106,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; Malware Detection System. All rights reserved.</p>
+            <p>&copy; AegisML ThreatShield — DREBIN-215 Dataset. All rights reserved.</p>
         </div>
     </footer>
 </body>
