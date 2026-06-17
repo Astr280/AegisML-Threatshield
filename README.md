@@ -25,6 +25,11 @@ This project implements an intelligent malware detection system that analyzes An
 - **User-friendly Interface**: Modern, responsive web interface with smooth animations
 - **Secure Login**: Protected access to the analysis dashboard
 
+## 🖼️ Dashboard Preview
+
+*(Add 2-3 screenshots or a short GIF of the dashboard, prediction UI, and performance charts here to show off the visual quality of the app!)*
+![Dashboard Preview](AegisML%20Threatsheild.png)
+
 ## 🛠️ Technology Stack
 
 ### Backend
@@ -81,6 +86,12 @@ python app.py
 ```
 
 The application will start on `http://127.0.0.1:5000/`
+
+### 🌐 Live Deployment (Render Free Tier)
+
+This application is ready to be deployed on Render! 
+
+*Note: The live demo is hosted on Render's free tier, which automatically spins down after 15 minutes of inactivity. When you first click the link, **it may take ~30-50 seconds to wake up**. Please be patient!*
 
 ## 📖 Usage Guide
 
