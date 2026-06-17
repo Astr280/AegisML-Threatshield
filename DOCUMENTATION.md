@@ -121,13 +121,13 @@ ExtraTreesClassifier(
 - **Base Estimator**: Decision Trees
 - **Randomization**: Both feature and threshold selection
 - **Advantages**:
-  - High accuracy (97.23%)
+  - High accuracy (~98.4%)
   - Handles non-linear relationships
   - Feature importance analysis
   - Robust to overfitting
 
 #### Performance
-- Test Accuracy: ~98.4%
+- Test Accuracy: 98.56%
 - Training Time: ~5-15 seconds (on 15,036 samples)
 
 ### 2. Random Forest Classifier
@@ -144,7 +144,7 @@ RandomForestClassifier(
 #### Characteristics
 - **Type**: Ensemble method
 - **Advantages**: Robust bagging algorithm, highly parallelizable, resistant to variance.
-- **Performance**: Test Accuracy: ~98.6%
+- **Performance**: Test Accuracy: 98.47%
 
 ### 3. Logistic Regression
 
@@ -165,7 +165,7 @@ LogisticRegression(
   - Probabilistic outputs
 
 #### Performance
-- Test Accuracy: ~95.7%
+- Test Accuracy: 97.56%
 - Training Time: ~5 seconds
 
 ---
@@ -359,7 +359,7 @@ Overall correctness
 
 | Metric | Extra Trees | Random Forest | Logistic Regression |
 |--------|-------------|---------------|---------------------|
-| Test Accuracy | ~98.4% | ~98.6% | ~95.7% |
+| Test Accuracy | 98.56% | 98.47% | 97.56% |
 | Memory Usage | High | High | Low |
 | Interpretability | Medium | Medium | High |
 
@@ -440,7 +440,8 @@ Overall correctness
 ## References
 
 ### Research Papers
-1. "Intelligent Pattern Recognition using Equilibrium Optimizer with Deep Learning Model for Android Malware Detection" (IEEE 2024)
+1. Yerima, S.Y. and Sezer, S., 2018. "DroidFusion: A Novel Multilevel Classifier Fusion Approach for Android Malware Detection" (IEEE Transactions on Cybernetics)
+2. Arp, D. et al., 2014. "DREBIN: Effective and Explainable Detection of Android Malware in Your Pocket" (NDSS 2014)
 
 ### Libraries Documentation
 - Flask: https://flask.palletsprojects.com/

@@ -15,7 +15,7 @@ from reportlab.lib import colors
 import io
 
 app = Flask(__name__)
-app.secret_key = 'malware_detection_secret_key_2024'
+app.secret_key = os.environ.get('SECRET_KEY', 'malware_detection_secret_key_2024')
 
 # ── Global state ──────────────────────────────────────────────────────
 extra_trees_model = None

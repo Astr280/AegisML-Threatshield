@@ -11,9 +11,9 @@ A comprehensive Android malware detection system powered by Machine Learning alg
 
 This project implements an intelligent malware detection system that analyzes Android applications based on their permission patterns and classifies them as either **Malware** or **Benign**. The system achieves high accuracy rates:
 
-- **Extra Trees Classifier**: ~98% test accuracy
-- **Random Forest**: ~98% test accuracy
-- **Logistic Regression**: ~95% test accuracy
+- **Extra Trees Classifier**: 98.56% test accuracy
+- **Random Forest**: 98.47% test accuracy
+- **Logistic Regression**: 97.56% test accuracy
 
 ## ✨ Features
 
@@ -132,11 +132,11 @@ This application is ready to be deployed on Render!
 ## 📈 Model Performance
 
 ### Extra Trees Classifier & Random Forest
-- **Test Accuracy**: ~98%
+- **Test Accuracy**: 98.56% (ET), 98.47% (RF)
 - **Advantages**: Higher accuracy, automatically calculates dynamic feature importance to highlight the most dangerous Android permissions.
 
 ### Logistic Regression
-- **Test Accuracy**: ~95%
+- **Test Accuracy**: 97.56%
 - **Advantages**: Faster training, interpretable coefficients. (Note: Uses StandardScaler for optimal convergence).
 
 ## 🎨 Design Features
