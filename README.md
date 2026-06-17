@@ -25,10 +25,7 @@ This project implements an intelligent malware detection system that analyzes An
 - **User-friendly Interface**: Modern, responsive web interface with smooth animations
 - **Secure Login**: Protected access to the analysis dashboard
 
-## 🖼️ Dashboard Preview
 
-*(Add 2-3 screenshots or a short GIF of the dashboard, prediction UI, and performance charts here to show off the visual quality of the app!)*
-![Dashboard Preview](AegisML%20Threatsheild.png)
 
 ## 🛠️ Technology Stack
 
